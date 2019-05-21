@@ -16,13 +16,13 @@
         console.log(header);
       });
 
-      const aln = api.getAlignment("https://s3.amazonaws.com/iobio/samples/bam/NA191.exome.bam");
+      const aln = api.getAlignment("https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam");
 
-      aln.onData((data) => {
-        console.log("data");
+      aln.on('data', (data) => {
+        console.log("yolo");
       });
 
-      aln.onEnd(() => {
+      aln.on('end', () => {
         console.log("done");
       });
     </script>
