@@ -7,6 +7,24 @@
   </head>
 
   <body>
-    <script type='module' src='/node_modules/gene-client/src/index.js'></script>
+    <script src='/node_modules/gene-client/dist/bundle.iife.js'></script>
+    <script>
+      const api = new iobio.Api();
+
+      api.getAlignmentHeader("https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam")
+      .then((header) => {
+        console.log(header);
+      });
+
+      const aln = api.getAlignment("https://s3.amazonaws.com/iobio/samples/bam/NA191.exome.bam");
+
+      aln.onData((data) => {
+        console.log("data");
+      });
+
+      aln.onEnd(() => {
+        console.log("done");
+      });
+    </script>
   </body>
 </html>

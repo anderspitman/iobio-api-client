@@ -1,3 +1,7 @@
+import { request } from 'xhr-stream-dl';
+
+console.log(request);
+
 export class Api {
 
   constructor() {
@@ -11,13 +15,10 @@ export class Api {
     const text = await result.text();
     return text;
   }
+
+  getAlignment(alignmentUrl) {
+    const query = this._server + "/getAlignment?alignmentUrl=" + encodeURIComponent(alignmentUrl);
+    const producer = request(query);
+    return producer;
+  }
 }
-
-(async () => {
-  const api = new Api();
-
-  api.getAlignmentHeader("https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam")
-  .then((header) => {
-    console.log(header);
-  });
-})();
