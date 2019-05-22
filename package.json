@@ -11,6 +11,9 @@
   },
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "xhr-stream-dl": "^0.1.0"
+  },
   "devDependencies": {
     "rollup": "^1.12.3",
     "rollup-plugin-node-resolve": "^5.0.0"
