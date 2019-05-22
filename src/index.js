@@ -9,7 +9,7 @@ export class Api {
   }
 
   async getAlignmentHeader(alignmentUrl) {
-    const query = this._server + "/getAlignmentHeader?alignmentUrl=" + encodeURIComponent(alignmentUrl);
+    const query = this._server + "/getAlignmentHeader?url=" + encodeURIComponent(alignmentUrl);
     console.log(query);
     const result = await fetch(query);
     const text = await result.text();
@@ -17,7 +17,7 @@ export class Api {
   }
 
   getAlignment(alignmentUrl) {
-    const query = this._server + "/getAlignment?alignmentUrl=" + encodeURIComponent(alignmentUrl);
+    const query = this._server + "/getAlignment?chr=18&url=" + encodeURIComponent(alignmentUrl);
     const producer = request(query);
     return producer;
   }
