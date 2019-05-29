@@ -8,17 +8,30 @@ export class Api {
     this._server = "http://localhost:9001";
   }
 
-  async getAlignmentHeader(alignmentUrl) {
-    const query = this._server + "/getAlignmentHeader?url=" + encodeURIComponent(alignmentUrl);
-    console.log(query);
-    const result = await fetch(query);
-    const text = await result.text();
-    return text;
+  async call(endpoint, params) {
+    const paramStr = encodeParams(params);
+    const query = encodeURI(this._server + "/" + endpoint + paramStr);
+    const stream = request(query);
+    return stream;
   }
+}
 
-  getAlignment(alignmentUrl) {
-    const query = this._server + "/getAlignment?chr=18&url=" + encodeURIComponent(alignmentUrl);
-    const producer = request(query);
-    return producer;
-  }
+function encodeParams(obj) {
+
+  const keys = Object.keys(obj);
+
+  const params = Object.keys(obj).map((key, i) => {
+    let sep = '&';
+    if (i === 0) {
+      sep = '?';
+    }
+
+    // TODO: might need this
+    //let value = encodeURIComponent(String(obj[key]));
+    const value = String(obj[key]);
+
+    return sep + key + '=' + value;
+  });
+
+  return params.join('');
 }

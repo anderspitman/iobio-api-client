@@ -9,22 +9,25 @@
   <body>
     <script src='/node_modules/iobio-client/dist/bundle.iife.js'></script>
     <script>
-      const api = new iobio.Api();
+      (async () => {
+        const api = new iobio.Api();
 
-      api.getAlignmentHeader("https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam")
-      .then((header) => {
-        console.log(header);
-      });
+        //const cmd = await api.call('bamReadDepther', {
+        //  url: "https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam.bai",
+        //});
 
-      const aln = api.getAlignment("https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam");
+        const cmd = await api.call('bamstatsAlive', {
+          url: "https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam",
+        });
 
-      aln.on('data', (data) => {
-        console.log("yolo");
-      });
+        cmd.on('data', (data) => {
+          console.log(data);
+        });
 
-      aln.on('end', () => {
-        console.log("done");
-      });
+        cmd.on('end', () => {
+          console.log("done");
+        });
+      })();
     </script>
   </body>
 </html>
