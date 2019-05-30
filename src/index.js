@@ -8,7 +8,7 @@ export class Api {
     this._server = "http://localhost:9001";
   }
 
-  async call(endpoint, params) {
+  call(endpoint, params) {
     const paramStr = encodeParams(params);
     const query = encodeURI(this._server + "/" + endpoint + paramStr);
     const stream = request(query);
