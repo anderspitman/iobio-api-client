@@ -48,13 +48,9 @@ export class Command {
     const query = encodeURI(this._server + "/call?pipeline=" + pipeline);
     this._stream = request(query);
 
-    this._stream.on('data', this._callbacks['data']);
-    this._stream.on('end', this._callbacks['end']);
-    this._stream.on('error', this._callbacks['error']);
-    this._stream.on('queue', this._callbacks['queue']);
-    this._stream.on('exit', this._callbacks['exit']);
-
-    this._stream.run();
+    this._stream.onData(this._callbacks['data']);
+    this._stream.onEnd(this._callbacks['end']);
+    this._stream.onError(this._callbacks['error']);
   }
 }
 
