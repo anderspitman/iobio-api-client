@@ -1,10 +1,12 @@
 import { request } from 'xhr-stream-dl';
 
 
-export class Command {
+class Command {
   constructor(name, args, options) {
 
-    this._server = "http://localhost:9001";
+    //this._server = "http://localhost:9001";
+    //this._server = "http://ec2-3-83-143-188.compute-1.amazonaws.com";
+    this._server = options && options.server ? options.server : "http://localhost:9001";
 
     this._callbacks = {
       'data': null,
@@ -46,6 +48,7 @@ export class Command {
     const pipeline = JSON.stringify(this.pipeline);
     //const paramStr = encodeParams(params);
     const query = encodeURI(this._server + "/call?pipeline=" + pipeline);
+    //console.log(query);
     this._stream = request(query);
 
     this._stream.onData(this._callbacks['data']);
@@ -55,40 +58,47 @@ export class Command {
 }
 
 
-export class Api {
+class Api {
 
-  constructor() {
-    this._server = "http://localhost:9001";
+  constructor(server) {
+    this.cmd = Command;
+    //this._server = "http://localhost:9001";
+    this._server = server;
   }
 
-  call(endpoint, params) {
-    const paramStr = encodeParams(params);
-    const query = encodeURI(this._server + "/" + endpoint + paramStr);
-    const stream = request(query);
-    return stream;
+  call(name, args, options) {
+    options = Object.assign({}, options, { server: this._server });
+    return new Command(name, args, options);
   }
+
+  //call(endpoint, params) {
+  //  const paramStr = encodeParams(params);
+  //  const query = encodeURI(this._server + "/" + endpoint + paramStr);
+  //  const stream = request(query);
+  //  return stream;
+  //}
 }
 
-function encodeParams(obj) {
+//function encodeParams(obj) {
+//
+//  const keys = Object.keys(obj);
+//
+//  const params = Object.keys(obj).map((key, i) => {
+//    let sep = '&';
+//    if (i === 0) {
+//      sep = '?';
+//    }
+//
+//    // TODO: might need this
+//    //let value = encodeURIComponent(String(obj[key]));
+//    const value = String(obj[key]);
+//
+//    return sep + key + '=' + value;
+//  });
+//
+//  return params.join('');
+//}
 
-  const keys = Object.keys(obj);
-
-  const params = Object.keys(obj).map((key, i) => {
-    let sep = '&';
-    if (i === 0) {
-      sep = '?';
-    }
-
-    // TODO: might need this
-    //let value = encodeURIComponent(String(obj[key]));
-    const value = String(obj[key]);
-
-    return sep + key + '=' + value;
-  });
-
-  return params.join('');
-}
-
-export const api = {
-  cmd: Command,
+export {
+  Api,
 };
