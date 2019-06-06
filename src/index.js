@@ -2,11 +2,9 @@ import { request } from 'xhr-stream-dl';
 
 
 class Command {
-  constructor(name, args, options) {
+  constructor(name, args, server, options) {
 
-    //this._server = "http://localhost:9001";
-    //this._server = "http://ec2-3-83-143-188.compute-1.amazonaws.com";
-    this._server = options && options.server ? options.server : "http://localhost:9001";
+    this._server = server;
 
     this._callbacks = {
       'data': null,
@@ -23,7 +21,7 @@ class Command {
 
   pipe(name, args, options) {
 
-    const other = new Command(name, args, options);
+    const other = new Command(name, args, this._server, options);
 
     this.pipeline = this.pipeline.concat(other.pipeline);
 
@@ -48,7 +46,6 @@ class Command {
     const pipeline = JSON.stringify(this.pipeline);
     //const paramStr = encodeParams(params);
     const query = encodeURI(this._server + "/call?pipeline=" + pipeline);
-    //console.log(query);
     this._stream = request(query);
 
     this._stream.onData(this._callbacks['data']);
@@ -62,13 +59,11 @@ class Api {
 
   constructor(server) {
     this.cmd = Command;
-    //this._server = "http://localhost:9001";
-    this._server = server;
+    this._server = 'http://' + server;
   }
 
   call(name, args, options) {
-    options = Object.assign({}, options, { server: this._server });
-    return new Command(name, args, options);
+    return new Command(name, args, this._server, options);
   }
 
   //call(endpoint, params) {
