@@ -46,7 +46,7 @@ class Command {
     const pipeline = JSON.stringify(this.pipeline);
     //const paramStr = encodeParams(params);
     const query = encodeURI(this._server + "/call?pipeline=" + pipeline);
-    console.log(query);
+    //console.log(query);
     this._stream = request(query);
 
     this._stream.onData(this._callbacks['data']);
