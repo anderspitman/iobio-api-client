@@ -3,9 +3,10 @@ import { request } from 'xhr-stream-dl';
 
 class Api {
 
-  constructor(server) {
+  constructor(server, options) {
     this.cmd = Command;
-    this._server = 'http://' + server;
+    const proto = options && options.secure ? 'https://' : 'http://';
+    this._server = proto + server;
   }
 
   alignmentHeader(url) {
