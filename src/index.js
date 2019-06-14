@@ -69,6 +69,10 @@ class Command {
     this._stream.onEnd(this._callbacks['end']);
     this._stream.onError(this._callbacks['error']);
   }
+
+  cancel() {
+    this._stream.cancel();
+  }
 }
 
 
