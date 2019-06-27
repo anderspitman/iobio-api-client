@@ -21,11 +21,15 @@ class Api {
     return new Command(this._server, 'craiReadDepth', { url });
   }
 
-  alignmentStatsStream(url, regions) {
+  alignmentStatsStream(url, indexUrl, regions) {
 
     //const regArr = regions.map(function(d) { return d.name+ ":"+ d.start + '-' + d.end;});
     //const regStr = JSON.stringify(regions.map(function(d) { return {start:d.start,end:d.end,chr:d.name};}));
-    return new Command(this._server, 'alignmentStatsStream', { url, regions: JSON.stringify(regions) });
+    return new Command(this._server, 'alignmentStatsStream', {
+      url,
+      indexUrl: indexUrl ? indexUrl : "",
+      regions: JSON.stringify(regions),
+    });
   }
 }
 
