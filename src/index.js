@@ -9,6 +9,8 @@ class Api {
     this._server = proto + server;
   }
 
+  // bam.iobio endpoints
+  //
   alignmentHeader(url) {
     return new Command(this._server, 'alignmentHeader', { url });
   }
@@ -29,6 +31,27 @@ class Api {
       url,
       indexUrl: indexUrl ? indexUrl : "",
       regions: JSON.stringify(regions),
+    });
+  }
+
+
+  // gene.iobio endpoints
+  //
+  variantHeader(url) {
+    return new Command(this._server, 'variantHeader', { url });
+  }
+
+  vcfReadDepth(url) {
+    return new Command(this._server, 'vcfReadDepth', { url });
+  }
+
+  alignmentCoverage(url, indexUrl, samtoolsRegion, maxPoints, coverageRegions) {
+    return new Command(this._server, 'alignmentCoverage', {
+      url,
+      indexUrl: indexUrl ? indexUrl : "",
+      samtoolsRegion: JSON.stringify(samtoolsRegion),
+      maxPoints,
+      coverageRegions: JSON.stringify(coverageRegions),
     });
   }
 }
