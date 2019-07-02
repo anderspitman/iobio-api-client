@@ -54,6 +54,18 @@ class Api {
       coverageRegions: JSON.stringify(coverageRegions),
     });
   }
+
+  geneCoverage(url, indexUrl, refName, geneName, regionStart, regionEnd, regions) {
+    return new Command(this._server, 'geneCoverage', {
+      url,
+      indexUrl: indexUrl ? indexUrl : "",
+      refName,
+      geneName,
+      regionStart,
+      regionEnd,
+      regions: JSON.stringify(regions),
+    });
+  }
 }
 
 
