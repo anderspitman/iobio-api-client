@@ -66,6 +66,17 @@ class Api {
       regions: JSON.stringify(regions),
     });
   }
+
+  normalizeVariants(vcfUrl, tbiUrl, refName, regions, contigStr, refFastaFile) {
+    return new Command(this._server, 'normalizeVariants', {
+      vcfUrl,
+      tbiUrl: tbiUrl ? tbiUrl: "",
+      refName,
+      regions: JSON.stringify(regions),
+      contigStr: encodeURIComponent(contigStr),
+      refFastaFile: encodeURIComponent(refFastaFile),
+    });
+  }
 }
 
 
@@ -101,7 +112,6 @@ class Command {
 
   run() {
     const query = encodeURI(this._server + '/' + this._endpoint + encodeParams(this._params));
-    //console.log(query);
     this._stream = request(query);
 
     this._stream.onData(this._callbacks['data']);
@@ -126,7 +136,7 @@ function encodeParams(obj) {
     }
 
     // TODO: might need this
-    //let value = encodeURIComponent(String(obj[key]));
+    //const value = encodeURIComponent(String(obj[key]));
     const value = String(obj[key]);
 
     return sep + key + '=' + value;
