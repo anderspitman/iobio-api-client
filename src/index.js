@@ -77,6 +77,16 @@ class Api {
       refFastaFile: encodeURIComponent(refFastaFile),
     });
   }
+
+  annotateVariants(args) {
+    return new Command(this._server, 'annotateVariants', Object.assign({},
+      args, {
+        refNames: JSON.stringify(args.refNames),
+        regions: JSON.stringify(args.regions),
+        vcfSampleNames: JSON.stringify(args.vcfSampleNames),
+      }
+    ));
+  }
 }
 
 
@@ -88,8 +98,8 @@ class Command {
     this._params = params;
 
     this._callbacks = {
-      'data': null,
-      'end': null,
+      'data': () => {},
+      'end': () => {},
       'error': null,
       'queue': null,
       'exit': null,
@@ -112,6 +122,7 @@ class Command {
 
   run() {
     const query = encodeURI(this._server + '/' + this._endpoint + encodeParams(this._params));
+    //console.log(query);
     this._stream = request(query);
 
     this._stream.onData(this._callbacks['data']);
