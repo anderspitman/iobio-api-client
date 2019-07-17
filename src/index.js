@@ -1,7 +1,8 @@
 import { request } from 'xhr-stream-dl';
+import { EventEmitter } from 'events';
 
 
-class Api {
+class Client {
 
   constructor(server, options) {
     this.cmd = Command;
@@ -87,37 +88,23 @@ class Api {
       }
     ));
   }
+
+
+  // genepanel endpoints
+  //
+  clinphen(args) {
+    return new Command(this._server, 'clinphen', args);
+  }
 }
 
 
-class Command {
+class Command extends EventEmitter {
   constructor(server, endpoint, params) {
+    super();
 
     this._server = server;
     this._endpoint = endpoint;
     this._params = params;
-
-    this._callbacks = {
-      'data': () => {},
-      'end': () => {},
-      'error': null,
-      'queue': null,
-      'exit': null,
-    };
-  }
-
-  on(eventName, callback) {
-    if (this._callbacks[eventName] !== undefined) {
-      this._callbacks[eventName] = callback;
-    }
-    else {
-      const valid = Object.keys(this._callbacks).join(', ');
-      throw new Error(`Invalid event name "${eventName}". Valid options are [${valid}]`);
-    }
-  }
-
-  off(eventName) {
-    delete this._callbacks[eventName];
   }
 
   run() {
@@ -125,9 +112,15 @@ class Command {
     //console.log(query);
     this._stream = request(query);
 
-    this._stream.onData(this._callbacks['data']);
-    this._stream.onEnd(this._callbacks['end']);
-    this._stream.onError(this._callbacks['error']);
+    this._stream.onData((data) => {
+      this.emit('data', data);
+    });
+    this._stream.onEnd(() => {
+      this.emit('end');
+    });
+    this._stream.onError((e) => {
+      this.emit('error', e);
+    });
   }
 
   cancel() {
@@ -158,5 +151,5 @@ function encodeParams(obj) {
 
 
 export {
-  Api,
+  Client,
 };

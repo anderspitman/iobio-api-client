@@ -1,4 +1,5 @@
 import resolve from 'rollup-plugin-node-resolve';
+import builtins from 'rollup-plugin-node-builtins';
 
 
 module.exports = {
@@ -20,5 +21,6 @@ module.exports = {
   ],
   plugins: [
     resolve(),
+    //builtins(),
   ],
 };

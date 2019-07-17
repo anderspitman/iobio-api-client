@@ -1,9 +1,9 @@
 {
   "name": "iobio-api-client",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "",
   "main": "./dist/bundle.cjs.js",
-  "module": "./dist/bundle.esm.js",
+  "module": "./src/index.js",
   "scripts": {
     "build": "rollup -c rollup.config.js",
     "watch": "rollup -c rollup.config.js --watch",
@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "rollup": "^1.12.3",
+    "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-resolve": "^5.0.0"
   }
 }
