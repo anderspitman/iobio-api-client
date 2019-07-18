@@ -92,8 +92,23 @@ class Client {
 
   // genepanel endpoints
   //
-  clinphen(args) {
+  async clinphen(args) {
+    return fetchNoStream(this._server, 'clinphen', args);
+  }
+  streamClinphen(args) {
     return new Command(this._server, 'clinphen', args);
+  }
+}
+
+
+async function fetchNoStream(server, endpoint, params) {
+  const query = encodeURI(server + '/' + endpoint + encodeParams(params));
+  const response = await fetch(query);
+  if (response.ok) {
+    return response.text();
+  }
+  else {
+    throw new Error(`iobio API call failed with status code ${response.status}: '${query}'`);
   }
 }
 

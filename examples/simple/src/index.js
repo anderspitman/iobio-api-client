@@ -9,8 +9,8 @@ const api = new Client('localhost:9001');
 //const cmd = api.getBaiReadDepth("https://s3.amazonaws.com/iobio/samples/bam/NA12891.exome.bam.bai");
 //const cmd = api.craiReadDepth("https://fbrg.xyz/6y44-72sg/16-243-140846.cram.crai");
 //const cmd = api.alignmentStatsStream("https://fbrg.xyz/6y44-72sg/16-243-140846.cram", regionStr);
-const cmd = api.clinphen({ notes: "The child has short stature and long eyelashes. She has a cleft palate and a small jaw"});
-
+const cmd = api.streamClinphen({ notes: "The child has short stature and long eyelashes. She has a cleft palate and a small jaw"});
+//
 cmd.on('data', (data) => {
   console.log(data);
 });
@@ -24,4 +24,12 @@ cmd.on('error', (e) => {
 });
 
 cmd.run();
+
+
+(async () => {
+
+  const response = await api.clinphen({ notes: "The child has short stature and long eyelashes. She has a cleft palate and a small jaw"});
+  console.log(response);
+
+})();
 
