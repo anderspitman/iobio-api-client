@@ -12,19 +12,19 @@ class Client {
 
   // bam.iobio endpoints
   //
-  alignmentHeader(url) {
+  streamAlignmentHeader(url) {
     return new Command(this._server, 'alignmentHeader', { url });
   }
 
-  baiReadDepth(url) {
+  streamBaiReadDepth(url) {
     return new Command(this._server, 'baiReadDepth', { url });
   }
 
-  craiReadDepth(url) {
+  streamCraiReadDepth(url) {
     return new Command(this._server, 'craiReadDepth', { url });
   }
 
-  alignmentStatsStream(url, indexUrl, regions) {
+  streamAlignmentStatsStream(url, indexUrl, regions) {
 
     //const regArr = regions.map(function(d) { return d.name+ ":"+ d.start + '-' + d.end;});
     //const regStr = JSON.stringify(regions.map(function(d) { return {start:d.start,end:d.end,chr:d.name};}));
@@ -38,15 +38,15 @@ class Client {
 
   // gene.iobio endpoints
   //
-  variantHeader(url) {
+  streamVariantHeader(url) {
     return new Command(this._server, 'variantHeader', { url });
   }
 
-  vcfReadDepth(url) {
+  streamVcfReadDepth(url) {
     return new Command(this._server, 'vcfReadDepth', { url });
   }
 
-  alignmentCoverage(url, indexUrl, samtoolsRegion, maxPoints, coverageRegions) {
+  streamAlignmentCoverage(url, indexUrl, samtoolsRegion, maxPoints, coverageRegions) {
     return new Command(this._server, 'alignmentCoverage', {
       url,
       indexUrl: indexUrl ? indexUrl : "",
@@ -56,7 +56,7 @@ class Client {
     });
   }
 
-  geneCoverage(url, indexUrl, refName, geneName, regionStart, regionEnd, regions) {
+  streamGeneCoverage(url, indexUrl, refName, geneName, regionStart, regionEnd, regions) {
     return new Command(this._server, 'geneCoverage', {
       url,
       indexUrl: indexUrl ? indexUrl : "",
@@ -68,7 +68,7 @@ class Client {
     });
   }
 
-  normalizeVariants(vcfUrl, tbiUrl, refName, regions, contigStr, refFastaFile) {
+  streamNormalizeVariants(vcfUrl, tbiUrl, refName, regions, contigStr, refFastaFile) {
     return new Command(this._server, 'normalizeVariants', {
       vcfUrl,
       tbiUrl: tbiUrl ? tbiUrl: "",
@@ -79,7 +79,7 @@ class Client {
     });
   }
 
-  annotateVariants(args) {
+  streamAnnotateVariants(args) {
     return new Command(this._server, 'annotateVariants', Object.assign({},
       args, {
         refNames: JSON.stringify(args.refNames),
