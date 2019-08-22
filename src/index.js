@@ -38,8 +38,11 @@ class Client {
 
   // gene.iobio endpoints
   //
-  streamVariantHeader(url) {
-    return new Command(this._server, 'variantHeader', { url });
+  streamVariantHeader(url, indexUrl) {
+    return new Command(this._server, 'variantHeader', { 
+      url,
+      indexUrl: indexUrl ? indexUrl : "",
+    });
   }
 
   streamVcfReadDepth(url) {
