@@ -50,12 +50,12 @@ class Client {
   }
 
   streamAlignmentCoverage(url, indexUrl, samtoolsRegion, maxPoints, coverageRegions) {
-    return new Command(this._server, 'alignmentCoverage', {
+    return new PostCommand(this._server, 'alignmentCoverage', {
       url,
       indexUrl: indexUrl ? indexUrl : "",
-      samtoolsRegion: JSON.stringify(samtoolsRegion),
+      samtoolsRegion,
       maxPoints,
-      coverageRegions: JSON.stringify(coverageRegions),
+      coverageRegions,
     });
   }
 
@@ -129,6 +129,40 @@ class Command extends EventEmitter {
     const query = encodeURI(this._server + '/' + this._endpoint + encodeParams(this._params));
     //console.log(query);
     this._stream = request(query);
+
+    this._stream.onData((data) => {
+      this.emit('data', data);
+    });
+    this._stream.onEnd(() => {
+      this.emit('end');
+    });
+    this._stream.onError((e) => {
+      this.emit('error', e);
+    });
+  }
+
+  cancel() {
+    this._stream.cancel();
+  }
+}
+
+
+class PostCommand extends EventEmitter {
+  constructor(server, endpoint, params) {
+    super();
+
+    this._server = server;
+    this._endpoint = endpoint;
+    this._params = params;
+  }
+
+  run() {
+    const query = this._server + '/' + this._endpoint;
+    //console.log(query);
+    this._stream = request(query, {
+      method: 'POST',
+      params: this._params,
+    });
 
     this._stream.onData((data) => {
       this.emit('data', data);
