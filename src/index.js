@@ -162,6 +162,7 @@ class PostCommand extends EventEmitter {
     this._stream = request(query, {
       method: 'POST',
       params: this._params,
+      contentType: 'text/plain; charset=utf-8',
     });
 
     this._stream.onData((data) => {
