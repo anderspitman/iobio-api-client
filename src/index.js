@@ -92,6 +92,9 @@ class Client {
     ));
   }
 
+  streamFreebayesJointCall(args) {
+    return new PostCommand(this._server, 'freebayesJointCall', args);
+  }
 
   // genepanel endpoints
   //
