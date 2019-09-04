@@ -96,6 +96,10 @@ class Client {
     return new PostCommand(this._server, 'freebayesJointCall', args);
   }
 
+  streamClinvarCountsForGene(args) {
+    return new PostCommand(this._server, 'clinvarCountsForGene', args);
+  }
+
   // genepanel endpoints
   //
   async clinphen(args) {
