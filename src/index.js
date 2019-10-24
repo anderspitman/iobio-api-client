@@ -10,6 +10,10 @@ class Client {
     this._server = proto + server;
   }
 
+  streamCommand(commandName, params) {
+    return new PostCommand(this._server, commandName, params);
+  }
+
   // bam.iobio endpoints
   //
   streamAlignmentHeader(url) {
