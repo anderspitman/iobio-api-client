@@ -22,26 +22,46 @@ class Command extends EventEmitter {
     this._server = server;
     this._endpoint = endpoint;
     this._params = params;
+    this._numRetries = 3;
   }
 
   run() {
-    const query = this._server + '/' + this._endpoint;
-    //console.log(query);
-    this._stream = request(query, {
-      method: 'POST',
-      params: this._params,
-      contentType: 'text/plain; charset=utf-8',
-    });
 
-    this._stream.onData((data) => {
-      this.emit('data', data);
-    });
-    this._stream.onEnd(() => {
-      this.emit('end');
-    });
-    this._stream.onError((e) => {
-      this.emit('error', e);
-    });
+    const query = this._server + '/' + this._endpoint;
+
+    let numAttempts = 0;
+
+    const attemptRequest = () => {
+
+      let emittedSome = false;
+
+      this._stream = request(query, {
+        method: 'POST',
+        params: this._params,
+        contentType: 'text/plain; charset=utf-8',
+      });
+
+      this._stream.onData((data) => {
+        this.emit('data', data);
+        emittedSome = true;
+      });
+      this._stream.onEnd(() => {
+        this.emit('end');
+      });
+      this._stream.onError((e) => {
+        // If we've already emitted data, don't try to fix the stream, and emit
+        // an error. Otherwise we may still be able to retry and succeed.
+        if (emittedSome === true) {
+          this.emit('error', e);
+        }
+        else if (numAttempts < this._numRetries) {
+          numAttempts += 1;
+          attemptRequest();
+        }
+      });
+    }
+
+    attemptRequest();
   }
 
   cancel() {
