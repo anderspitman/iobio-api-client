@@ -29,11 +29,11 @@ class Command extends EventEmitter {
 
     const query = this._server + '/' + this._endpoint;
 
-    let numAttempts = 0;
+    let numAttempts = 1;
+    let emittedData = false;
+    let emittedErr = false;
 
     const attemptRequest = () => {
-
-      let emittedSome = false;
 
       this._stream = request(query, {
         method: 'POST',
@@ -43,23 +43,43 @@ class Command extends EventEmitter {
 
       this._stream.onData((data) => {
         this.emit('data', data);
-        emittedSome = true;
+        emittedData = true;
       });
       this._stream.onEnd(() => {
         this.emit('end');
       });
       this._stream.onError((e) => {
+
         // If we've already emitted data, don't try to fix the stream, and emit
         // an error. Otherwise we may still be able to retry and succeed.
-        if (emittedSome === true) {
-          this.emit('error', e);
+        if (emittedData === true || numAttempts >= this._numRetries) {
+          // emittedErr is for preventing duplicate errors
+          if (!emittedErr) {
+            emittedErr = true;
+            logToServer(e);
+            this.emit('error', e);
+          }
         }
-        else if (numAttempts < this._numRetries) {
+        else {
+          this._stream.cancel();
           numAttempts += 1;
           attemptRequest();
         }
       });
     }
+
+    const logToServer = (e) => {
+      fetch('http://log.iobio.io', {
+        method: 'POST',
+        body: JSON.stringify({
+          type: 'error',
+          error: e,
+          numAttempts,
+          endpoint: this._endpoint,
+          params: this._params,
+        }, null, 2),
+      });
+    };
 
     attemptRequest();
   }
