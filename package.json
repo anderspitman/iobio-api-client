@@ -1,6 +1,6 @@
 {
   "name": "iobio-api-client",
-  "version": "0.6.0",
+  "version": "0.7.2",
   "description": "",
   "main": "./dist/bundle.cjs.js",
   "module": "./src/index.js",
@@ -12,11 +12,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "xhr-stream-dl": "^1.5.0"
+    "xhr-stream-dl": "^2.0.0"
   },
   "devDependencies": {
-    "rollup": "^1.12.3",
+    "rollup": "^2.7.3",
     "rollup-plugin-node-builtins": "^2.1.2",
-    "rollup-plugin-node-resolve": "^5.0.0"
+    "rollup-plugin-node-resolve": "^5.2.0"
   }
 }
