@@ -69,7 +69,10 @@ class Command extends EventEmitter {
     }
 
     const logToServer = (e) => {
-      fetch('http://log.iobio.io', {
+      // This is just a random endpoint to avoid bots accidentally submitting
+      // garbage as reports. It's not a security measure, as it's trivial
+      // to inspect our network calls to determine the endpoint.
+      fetch('http://log.iobio.io/eGJvfRfF300fGpxnB52LmFpD9IIJPzYb', {
         method: 'POST',
         body: JSON.stringify({
           type: 'error',
