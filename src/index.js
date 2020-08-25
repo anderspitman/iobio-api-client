@@ -72,7 +72,7 @@ class Command extends EventEmitter {
       // This is just a random endpoint to avoid bots accidentally submitting
       // garbage as reports. It's not a security measure, as it's trivial
       // to inspect our network calls to determine the endpoint.
-      fetch('http://log.iobio.io/eGJvfRfF300fGpxnB52LmFpD9IIJPzYb', {
+      fetch('https://log.iobio.io/eGJvfRfF300fGpxnB52LmFpD9IIJPzYb', {
         method: 'POST',
         body: JSON.stringify({
           type: 'error',
