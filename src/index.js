@@ -5,8 +5,7 @@ import { EventEmitter } from 'events';
 class Client {
 
   constructor(server, options) {
-    const proto = options && options.secure ? 'https://' : 'http://';
-    this._server = proto + server;
+    this._server = server;
   }
 
   streamCommand(commandName, params) {
