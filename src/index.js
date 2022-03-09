@@ -34,9 +34,14 @@ class Command extends EventEmitter {
 
     const attemptRequest = () => {
 
+      const requestId = genRandomId();
+      const params = Object.assign({
+        _requestId: requestId,
+      }, this._params);
+
       this._stream = request(query, {
         method: 'POST',
-        params: this._params,
+        params: params,
         contentType: 'text/plain; charset=utf-8',
       });
 
@@ -55,7 +60,7 @@ class Command extends EventEmitter {
           // emittedErr is for preventing duplicate errors
           if (!emittedErr) {
             emittedErr = true;
-            logToServer(e);
+            logToServer(params, e);
             this.emit('error', e);
           }
         }
@@ -67,7 +72,7 @@ class Command extends EventEmitter {
       });
     }
 
-    const logToServer = (e) => {
+    const logToServer = (params, e) => {
       // This is just a random endpoint to avoid bots accidentally submitting
       // garbage as reports. It's not a security measure, as it's trivial
       // to inspect our network calls to determine the endpoint.
@@ -78,7 +83,7 @@ class Command extends EventEmitter {
           error: e,
           numAttempts,
           endpoint: this._endpoint,
-          params: this._params,
+          params: params,
         }, null, 2),
       });
     };
@@ -89,6 +94,24 @@ class Command extends EventEmitter {
   cancel() {
     this._stream.cancel();
   }
+}
+
+// Modified from https://stackoverflow.com/a/1349426
+function genRandomId() {
+  let result           = '';
+  //const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const characters       = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  for ( var i = 0; i < 4; i++ ) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+
+  result += "-";
+
+  for ( var i = 0; i < 4; i++ ) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
 }
 
 
