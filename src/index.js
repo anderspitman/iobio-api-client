@@ -37,6 +37,8 @@ class Command extends EventEmitter {
       const requestId = genRandomId();
       const params = Object.assign({
         _requestId: requestId,
+        _appendErrors: true,
+        _attemptNum: numAttempts,
       }, this._params);
 
       this._stream = request(query, {
@@ -45,12 +47,20 @@ class Command extends EventEmitter {
         contentType: 'text/plain; charset=utf-8',
       });
 
+      let lastChunk = "";
+
       this._stream.onData((data) => {
+        lastChunk = data;
         this.emit('data', data);
         emittedData = true;
       });
       this._stream.onEnd(() => {
-        this.emit('end');
+        if (lastChunk.endsWith("GRU_ERROR_SENTINEL")) {
+          this.emit('error', "Unknown streaming error");
+        }
+        else {
+          this.emit('end');
+        }
       });
       this._stream.onError((e) => {
 
