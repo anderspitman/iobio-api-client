@@ -34,18 +34,33 @@ class Command extends EventEmitter {
 
     const attemptRequest = () => {
 
+      const requestId = genRandomId();
+      const params = Object.assign({
+        _requestId: requestId,
+        _appendErrors: true,
+        _attemptNum: numAttempts,
+      }, this._params);
+
       this._stream = request(query, {
         method: 'POST',
-        params: this._params,
+        params: params,
         contentType: 'text/plain; charset=utf-8',
       });
 
+      let lastChunk = "";
+
       this._stream.onData((data) => {
+        lastChunk = data;
         this.emit('data', data);
         emittedData = true;
       });
       this._stream.onEnd(() => {
-        this.emit('end');
+        if (lastChunk.endsWith("GRU_ERROR_SENTINEL")) {
+          this.emit('error', "Unknown streaming error");
+        }
+        else {
+          this.emit('end');
+        }
       });
       this._stream.onError((e) => {
 
@@ -55,7 +70,7 @@ class Command extends EventEmitter {
           // emittedErr is for preventing duplicate errors
           if (!emittedErr) {
             emittedErr = true;
-            logToServer(e);
+            //logToServer(params, e);
             this.emit('error', e);
           }
         }
@@ -67,21 +82,21 @@ class Command extends EventEmitter {
       });
     }
 
-    const logToServer = (e) => {
-      // This is just a random endpoint to avoid bots accidentally submitting
-      // garbage as reports. It's not a security measure, as it's trivial
-      // to inspect our network calls to determine the endpoint.
-      fetch('https://log.iobio.io/eGJvfRfF300fGpxnB52LmFpD9IIJPzYb', {
-        method: 'POST',
-        body: JSON.stringify({
-          type: 'error',
-          error: e,
-          numAttempts,
-          endpoint: this._endpoint,
-          params: this._params,
-        }, null, 2),
-      });
-    };
+    //const logToServer = (params, e) => {
+    //  // This is just a random endpoint to avoid bots accidentally submitting
+    //  // garbage as reports. It's not a security measure, as it's trivial
+    //  // to inspect our network calls to determine the endpoint.
+    //  fetch('https://log.iobio.io/eGJvfRfF300fGpxnB52LmFpD9IIJPzYb', {
+    //    method: 'POST',
+    //    body: JSON.stringify({
+    //      type: 'error',
+    //      error: e,
+    //      numAttempts,
+    //      endpoint: this._endpoint,
+    //      params: params,
+    //    }, null, 2),
+    //  });
+    //};
 
     attemptRequest();
   }
@@ -89,6 +104,24 @@ class Command extends EventEmitter {
   cancel() {
     this._stream.cancel();
   }
+}
+
+// Modified from https://stackoverflow.com/a/1349426
+function genRandomId() {
+  let result           = '';
+  //const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const characters       = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  for ( var i = 0; i < 4; i++ ) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+
+  result += "-";
+
+  for ( var i = 0; i < 4; i++ ) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
 }
 
 
