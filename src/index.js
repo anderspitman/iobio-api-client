@@ -75,6 +75,7 @@ class Command extends EventEmitter {
             type: 'gru',
             data: errorObj,
           });
+          logToServer(params);
         }
         else {
           this.emit('end');
@@ -88,7 +89,7 @@ class Command extends EventEmitter {
           // emittedErr is for preventing duplicate errors
           if (!emittedErr) {
             emittedErr = true;
-            //logToServer(params, e);
+            logToServer(params);
             this.emit('error', {
               type: 'stream',
               data: e,
@@ -103,21 +104,23 @@ class Command extends EventEmitter {
       });
     }
 
-    //const logToServer = (params, e) => {
-    //  // This is just a random endpoint to avoid bots accidentally submitting
-    //  // garbage as reports. It's not a security measure, as it's trivial
-    //  // to inspect our network calls to determine the endpoint.
-    //  fetch('https://log.iobio.io/eGJvfRfF300fGpxnB52LmFpD9IIJPzYb', {
-    //    method: 'POST',
-    //    body: JSON.stringify({
-    //      type: 'error',
-    //      error: e,
-    //      numAttempts,
-    //      endpoint: this._endpoint,
-    //      params: params,
-    //    }, null, 2),
-    //  });
-    //};
+    const logToServer = (params) => {
+      // This is just a random endpoint to avoid bots accidentally submitting
+      // garbage as reports. It's not a security measure, as it's trivial
+      // to inspect our network calls to determine the endpoint.
+      fetch('https://log.iobio.io/eGJvfRfF300fGpxnB52LmFpD9IIJPzYb', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+        body: JSON.stringify({
+          requestId: params._requestId,
+          type: 'error',
+          endpoint: this._endpoint,
+          numAttempts: params._attemptNum,
+        }, null, 2),
+      });
+    };
 
     attemptRequest();
   }
