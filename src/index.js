@@ -47,16 +47,34 @@ class Command extends EventEmitter {
         contentType: 'text/plain; charset=utf-8',
       });
 
-      let lastChunk = "";
+      let hasError = false;
+      let errorData = "";
 
       this._stream.onData((data) => {
-        lastChunk = data;
-        this.emit('data', data);
-        emittedData = true;
+        // TODO: only set errorData to everything after GRU_ERROR_SENTINEL
+        const sentinelIndex = data.indexOf("GRU_ERROR_SENTINEL");
+        if (-1 !== sentinelIndex) {
+          hasError = true;
+          // The rest of the stream will be stderr if available, so skip past
+          // the sentinel.
+          data = data.substring(sentinelIndex + "GRU_ERROR_SENTINEL".length);
+        }
+
+        if (hasError) {
+          errorData += data;
+        }
+        else {
+          this.emit('data', data);
+          emittedData = true;
+        }
       });
       this._stream.onEnd(() => {
-        if (lastChunk.endsWith("GRU_ERROR_SENTINEL")) {
-          this.emit('error', "Unknown streaming error");
+        if (hasError) {
+          const errorObj = JSON.parse(errorData);
+          this.emit('error', {
+            type: 'gru',
+            data: errorObj,
+          });
         }
         else {
           this.emit('end');
@@ -71,7 +89,10 @@ class Command extends EventEmitter {
           if (!emittedErr) {
             emittedErr = true;
             //logToServer(params, e);
-            this.emit('error', e);
+            this.emit('error', {
+              type: 'stream',
+              data: e,
+            });
           }
         }
         else {
