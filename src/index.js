@@ -71,10 +71,7 @@ class Command extends EventEmitter {
       this._stream.onEnd(() => {
         if (hasError) {
           const errorObj = JSON.parse(errorData);
-          this.emit('error', {
-            type: 'gru',
-            data: errorObj,
-          });
+          this.emit('error', errorObj.stderr);
           logToServer(params);
         }
         else {
@@ -90,10 +87,7 @@ class Command extends EventEmitter {
           if (!emittedErr) {
             emittedErr = true;
             logToServer(params);
-            this.emit('error', {
-              type: 'stream',
-              data: e,
-            });
+            this.emit('error', e.text);
           }
         }
         else {
