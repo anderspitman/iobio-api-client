@@ -47,16 +47,32 @@ class Command extends EventEmitter {
         contentType: 'text/plain; charset=utf-8',
       });
 
-      let lastChunk = "";
+      let hasError = false;
+      let errorData = "";
 
       this._stream.onData((data) => {
-        lastChunk = data;
-        this.emit('data', data);
-        emittedData = true;
+        // TODO: only set errorData to everything after GRU_ERROR_SENTINEL
+        const sentinelIndex = data.indexOf("GRU_ERROR_SENTINEL");
+        if (-1 !== sentinelIndex) {
+          hasError = true;
+          // The rest of the stream will be stderr if available, so skip past
+          // the sentinel.
+          data = data.substring(sentinelIndex + "GRU_ERROR_SENTINEL".length);
+        }
+
+        if (hasError) {
+          errorData += data;
+        }
+        else {
+          this.emit('data', data);
+          emittedData = true;
+        }
       });
       this._stream.onEnd(() => {
-        if (lastChunk.endsWith("GRU_ERROR_SENTINEL")) {
-          this.emit('error', "Unknown streaming error");
+        if (hasError) {
+          const errorObj = JSON.parse(errorData);
+          this.emit('error', errorObj.stderr);
+          logToServer(params);
         }
         else {
           this.emit('end');
@@ -70,8 +86,8 @@ class Command extends EventEmitter {
           // emittedErr is for preventing duplicate errors
           if (!emittedErr) {
             emittedErr = true;
-            //logToServer(params, e);
-            this.emit('error', e);
+            logToServer(params);
+            this.emit('error', e.text);
           }
         }
         else {
@@ -82,21 +98,23 @@ class Command extends EventEmitter {
       });
     }
 
-    //const logToServer = (params, e) => {
-    //  // This is just a random endpoint to avoid bots accidentally submitting
-    //  // garbage as reports. It's not a security measure, as it's trivial
-    //  // to inspect our network calls to determine the endpoint.
-    //  fetch('https://log.iobio.io/eGJvfRfF300fGpxnB52LmFpD9IIJPzYb', {
-    //    method: 'POST',
-    //    body: JSON.stringify({
-    //      type: 'error',
-    //      error: e,
-    //      numAttempts,
-    //      endpoint: this._endpoint,
-    //      params: params,
-    //    }, null, 2),
-    //  });
-    //};
+    const logToServer = (params) => {
+      // This is just a random endpoint to avoid bots accidentally submitting
+      // garbage as reports. It's not a security measure, as it's trivial
+      // to inspect our network calls to determine the endpoint.
+      fetch('https://log.iobio.io/eGJvfRfF300fGpxnB52LmFpD9IIJPzYb', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+        body: JSON.stringify({
+          requestId: params._requestId,
+          type: 'error',
+          endpoint: this._endpoint,
+          numAttempts: params._attemptNum,
+        }, null, 2),
+      });
+    };
 
     attemptRequest();
   }
